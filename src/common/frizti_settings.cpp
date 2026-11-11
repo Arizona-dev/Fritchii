@@ -1,3 +1,4 @@
+#pragma warning(disable : 4456 4457 4458 4459) // LOCAL BUILD ONLY
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <fmt/format.h>

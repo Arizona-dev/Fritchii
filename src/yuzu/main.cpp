@@ -397,3 +397,90 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 }
+
+// LOCAL BUILD ONLY: vectorized STL entry points the prebuilt static Qt expects from a newer MSVC STL.
+#include <cstdint>
+extern "C" {
+void __stdcall __std_rotate(void* first_, void* mid_, void* last_) noexcept {
+    auto* first = static_cast<unsigned char*>(first_);
+    auto* mid = static_cast<unsigned char*>(mid_);
+    auto* last = static_cast<unsigned char*>(last_);
+    const auto reverse = [](unsigned char* a, unsigned char* b) {
+        while (a < b) {
+            --b;
+            const unsigned char t = *a;
+            *a = *b;
+            *b = t;
+            ++a;
+        }
+    };
+    reverse(first, mid);
+    reverse(mid, last);
+    reverse(first, last);
+}
+void* __stdcall __std_unique_4(void* first_, void* last_) noexcept {
+    auto* first = static_cast<std::uint32_t*>(first_);
+    auto* last = static_cast<std::uint32_t*>(last_);
+    if (first == last) {
+        return last;
+    }
+    auto* out = first;
+    for (auto* it = first + 1; it != last; ++it) {
+        if (*it != *out) {
+            *++out = *it;
+        }
+    }
+    return out + 1;
+}
+void* __stdcall __std_unique_8(void* first_, void* last_) noexcept {
+    auto* first = static_cast<std::uint64_t*>(first_);
+    auto* last = static_cast<std::uint64_t*>(last_);
+    if (first == last) {
+        return last;
+    }
+    auto* out = first;
+    for (auto* it = first + 1; it != last; ++it) {
+        if (*it != *out) {
+            *++out = *it;
+        }
+    }
+    return out + 1;
+}
+struct LocalMinMax {
+    const void* min;
+    const void* max;
+};
+LocalMinMax __stdcall __std_minmax_element_2u(const void* first_, const void* last_) noexcept {
+    const auto* first = static_cast<const std::uint16_t*>(first_);
+    const auto* last = static_cast<const std::uint16_t*>(last_);
+    const std::uint16_t* lo = first;
+    const std::uint16_t* hi = first;
+    for (const auto* it = first; it != last; ++it) {
+        if (*it < *lo) {
+            lo = it;
+        }
+        if (*it >= *hi) {
+            hi = it;
+        }
+    }
+    return {lo, hi};
+}
+void __stdcall __std_replace_copy_1(const void* first_, const void* last_, void* dest_,
+                                    std::uint8_t old_value, std::uint8_t new_value) noexcept {
+    const auto* first = static_cast<const std::uint8_t*>(first_);
+    const auto* last = static_cast<const std::uint8_t*>(last_);
+    auto* dest = static_cast<std::uint8_t*>(dest_);
+    for (; first != last; ++first, ++dest) {
+        *dest = *first == old_value ? new_value : *first;
+    }
+}
+void __stdcall __std_replace_copy_2(const void* first_, const void* last_, void* dest_,
+                                    std::uint16_t old_value, std::uint16_t new_value) noexcept {
+    const auto* first = static_cast<const std::uint16_t*>(first_);
+    const auto* last = static_cast<const std::uint16_t*>(last_);
+    auto* dest = static_cast<std::uint16_t*>(dest_);
+    for (; first != last; ++first, ++dest) {
+        *dest = *first == old_value ? new_value : *first;
+    }
+}
+}

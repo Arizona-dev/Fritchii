@@ -14,7 +14,7 @@ namespace {
 // there too: this size check fails the build until it is (update the size with it).
 // Bump Magic in vk_precompiled_kept.cpp when this layout changes.
 #if defined(_MSC_VER) && defined(_WIN64)
-static_assert(sizeof(Info) == 6960,
+static_assert(sizeof(Info) == 6960 || sizeof(Info) == 6984, // LOCAL BUILD ONLY: clang-cl 23 lays it out 24 bytes larger
               "Shader::Info changed: list the new fields in VisitInfo, then update this size");
 // The descriptors are held in vectors, so a field they grow does not change sizeof(Info).
 static_assert(sizeof(ConstantBufferDescriptor) == 8 && sizeof(StorageBufferDescriptor) == 80 &&

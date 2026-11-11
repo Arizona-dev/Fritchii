@@ -1,3 +1,4 @@
+#pragma clang diagnostic ignored "-Wrange-loop-construct" // LOCAL BUILD ONLY (clang 23)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "yuzu/fritchii/fritchii_ui.h"
